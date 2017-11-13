@@ -23,11 +23,10 @@ public class MenuActivity extends AppCompatActivity {
 
     ListView menuListView;
     List list = new ArrayList();
-    String listName;
     ArrayAdapter adapter;
     String url;
     RequestQueue queue;
-    JSONArray jsonArray;
+    String jsonResponse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,32 +35,24 @@ public class MenuActivity extends AppCompatActivity {
 
         menuListView = findViewById(R.id.menuListView);
         url = "https://resto.mprog.nl/";
-        listName = "categories";
         queue = Volley.newRequestQueue(this);
 
-        list = getListFromAPI(listName);
+        list = getMenu();
 
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, list);
 
         menuListView.setAdapter(adapter);
     }
 
-    private List getListFromAPI(String listName) {
-        String newUrl = url + listName;
-        List list = new ArrayList();
-
-        Log.d("URL", newUrl);
+    private List getMenu() {
+        String newUrl = url + "categories";
 
         // Request a string response from the provided URL.
         StringRequest stringRequest = new StringRequest(Request.Method.GET, newUrl,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        try {
-                            jsonArray = new JSONArray(response);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+                        jsonResponse = response;
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -71,9 +62,10 @@ public class MenuActivity extends AppCompatActivity {
         });
         queue.add(stringRequest);
 
-        for(int i = 0; i < jsonArray.length(); i++) {
-            list.add(jsonArray.getString());
-        }
+        ArrayList list = new ArrayList();
+
+        list.add("appetizers");
+        list.add("entrees");
 
         return list;
     }
