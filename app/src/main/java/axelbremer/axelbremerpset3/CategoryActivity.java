@@ -16,18 +16,15 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.List;
 
-public class MenuActivity extends AppCompatActivity {
-
-    ListView menuListView;
+public class CategoryActivity extends AppCompatActivity {
+    ListView categoryListView;
     List list = new ArrayList();
+    String category;
     List<Dish> menu = new ArrayList<>();
-    List categoryList = new ArrayList();
+    List<Dish> catMenu = new ArrayList<>();
     ArrayAdapter adapter;
     String url;
     RequestQueue queue;
@@ -36,39 +33,66 @@ public class MenuActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_menu);
+        setContentView(R.layout.activity_category);
 
-        menuListView = findViewById(R.id.menuListView);
+        categoryListView = findViewById(R.id.categoryListView);
         url = "https://resto.mprog.nl/";
         queue = Volley.newRequestQueue(this);
+
+        Intent intent = getIntent();
+        category = intent.getStringExtra("Category");
+
+        Log.d("CATEGORY", category);
 
         getMenu();
 
         for(int i = 0; i < menu.size(); i++) {
             Dish temp = menu.get(i);
-            categoryList.add(temp.getCategory());
+            Log.d("MENU", "dish: " + temp.getName());
+            if(temp.getCategory().equals(category)) {
+                catMenu.add(temp);
+            }
         }
 
-        list = categoryList;
+        for(int i = 0; i < catMenu.size(); i++) {
+            Dish temp = catMenu.get(i);
+            Log.d("CATMENU", "dishInCat: " + temp.getName());
+            list.add(temp.getName());
+        }
 
-        updateListView();
-
-        menuListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        categoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position,
                                     long id) {
-                Intent intent = new Intent(MenuActivity.this, CategoryActivity.class);
-                String category = (String) categoryList.get(position);
-                intent.putExtra("Category", category);
+                Intent intent = new Intent(CategoryActivity.this, DishActivity.class);
+                Dish chosen = getDishByName((String)list.get(position));
+                Integer chosenId = chosen.getId();
+                intent.putExtra("Id", chosenId);
                 startActivity(intent);
             }
         });
+
+        updateListView();
+
+    }
+
+    private Dish getDishByName(String name) {
+        Dish dish = new Dish();
+
+        for(int i = 0; i < menu.size(); i++) {
+            Dish temp = menu.get(i);
+            if(temp.getName().equals(name)) {
+                dish = temp;
+            }
+        }
+
+        return dish;
     }
 
     private void updateListView() {
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, list);
 
-        menuListView.setAdapter(adapter);
+        categoryListView.setAdapter(adapter);
     }
 
     private void getMenu() {

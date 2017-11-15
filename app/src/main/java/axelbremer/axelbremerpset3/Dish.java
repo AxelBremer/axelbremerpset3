@@ -1,23 +1,53 @@
 package axelbremer.axelbremerpset3;
 
+import java.io.Serializable;
+
 /**
  * Created by axel on 13-11-17.
  */
 
-public class Dish {
-    String name;
-    String category;
-    String description;
-    String url;
-    int id;
-    int price;
+public class Dish implements Serializable{
+    private String name;
+    private String category;
+    private String description;
+    private String url;
+    private int id;
+    private double price;
 
-    public Dish(String aName, String aCategory, String aDescription, String anUrl, int anId, int aPrice) {
+    public Dish(String aName, String aCategory, String aDescription, String anUrl, int anId, double aPrice) {
         name = aName;
         category = aCategory;
         description = aDescription;
         url = anUrl;
         id = anId;
         price = aPrice;
+    }
+
+    public Dish() {
+        this(null, null, null, null, -5, -1);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public double getPrice() {
+        return price;
     }
 }
