@@ -1,8 +1,6 @@
 package axelbremer.axelbremerpset3;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,16 +9,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,9 +20,7 @@ public class CategoryActivity extends AppCompatActivity {
     List<Dish> menu = new ArrayList<>();
     List<Dish> catMenu = new ArrayList<>();
     ArrayAdapter adapter;
-    String url;
-    RequestQueue queue;
-    String jsonResponse;
+    MyGlobals myGlob;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,17 +28,15 @@ public class CategoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_category);
 
         categoryListView = findViewById(R.id.categoryListView);
-        url = "https://resto.mprog.nl/";
-        queue = Volley.newRequestQueue(this);
 
-        loadFromSharedPrefs();
+        myGlob = new MyGlobals(getApplicationContext());
+
+        order = myGlob.loadFromSharedPrefs();
 
         Intent intent = getIntent();
         category = intent.getStringExtra("Category");
 
-        Log.d("CATEGORY", category);
-
-        getMenu();
+        menu = myGlob.getMenu();
 
         for(int i = 0; i < menu.size(); i++) {
             Dish temp = menu.get(i);
@@ -104,54 +88,9 @@ public class CategoryActivity extends AppCompatActivity {
         categoryListView.setAdapter(adapter);
     }
 
-    private void getMenu() {
-//        String newUrl = url + "menu";
-//
-//        // Request a string response from the provided URL.
-//        StringRequest stringRequest = new StringRequest(Request.Method.GET, newUrl,
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        jsonResponse = response;
-//                        Log.d("RESPONSE", "onResponse: " + response);
-//                    }
-//                }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                Log.d("SHIT", "onErrorResponse: wrong");
-//            }
-//        });
-//        queue.add(stringRequest);
-
-        Dish spaghetti = new Dish("Spaghetti and Meatballs", "entrees", "Seasoned meatballs on top of freshly-made spaghetti. Served with a robust tomato sauce.", "http://resto.mprog.nl/images/spaghetti.jpg", 1, 9.0);
-        Dish soup = new Dish("Chicken Noodle Soup", "appetizers", "Delicious chicken simmered alongside yellow onions, carrots, celery, and bay leaves, chicken stock.", "http://resto.mprog.nl/images/chickensoup.jpg", 5, 3.0);
-
-        menu.add(spaghetti);
-        menu.add(soup);
-    }
-
-    public void saveToSharedPrefs(){
-        SharedPreferences prefs = getSharedPreferences("settings", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        Gson gson = new Gson();
-
-        String json = gson.toJson(order);
-
-        editor.putString("order", json);
-        editor.commit();
-    }
-
-    public void loadFromSharedPrefs(){
-        SharedPreferences prefs = getSharedPreferences("settings", Context.MODE_PRIVATE);
-
-        Gson gson = new Gson();
-        String json = prefs.getString("order", null);
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
-        ArrayList<String> order = gson.fromJson(json, type);
-
-        if(order == null) {
-            Log.d("NULL", "loadFromSharedPrefs: null");
-            order = new ArrayList<>();
-        }
+    public void onSeeOrderButtonClick(View view) {
+        Intent intent = new Intent(CategoryActivity.this, OrderActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

@@ -1,12 +1,10 @@
 package axelbremer.axelbremerpset3;
 
-import java.io.Serializable;
-
 /**
  * Created by axel on 13-11-17.
  */
 
-public class Dish implements Serializable{
+public class Dish{
     private String name;
     private String category;
     private String description;

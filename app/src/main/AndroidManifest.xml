@@ -21,7 +21,8 @@
         <activity android:name=".MenuActivity" />
         <activity android:name=".CategoryActivity" />
         <activity android:name=".DishActivity" />
-        <activity android:name=".OrderActivity"></activity>
+        <activity android:name=".OrderActivity" />
+        <activity android:name=".LastActivity"></activity>
     </application>
 
 </manifest>

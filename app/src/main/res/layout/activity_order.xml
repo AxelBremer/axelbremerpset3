@@ -4,10 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="axelbremer.axelbremerpset3.OrderActivity">
 
     <ListView
         android:id="@+id/orderListView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:layout_weight="9"></ListView>
+
+    <Button
+        android:id="@+id/orderButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:onClick="onOrderButtonClick"
+        android:text="@string/orderText"
+        android:layout_gravity="center_horizontal"/>
 </LinearLayout>

@@ -32,12 +32,11 @@ public class MenuActivity extends AppCompatActivity {
     ListView menuListView;
     List list = new ArrayList();
     List<Dish> menu = new ArrayList<>();
-    List<String> order = new ArrayList<>();
     List categoryList = new ArrayList();
     ArrayAdapter adapter;
     String url;
     RequestQueue queue;
-    String jsonResponse;
+    MyGlobals myGlob;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +47,11 @@ public class MenuActivity extends AppCompatActivity {
         url = "https://resto.mprog.nl/";
         queue = Volley.newRequestQueue(this);
 
-        getMenu();
+        myGlob = new MyGlobals(getApplicationContext());
 
-        loadFromSharedPrefs();
+        myGlob.getMenu();
+
+        myGlob.loadFromSharedPrefs();
 
         for(int i = 0; i < menu.size(); i++) {
             Dish temp = menu.get(i);
@@ -79,54 +80,9 @@ public class MenuActivity extends AppCompatActivity {
         menuListView.setAdapter(adapter);
     }
 
-    private void getMenu() {
-//        String newUrl = url + "menu";
-//
-//        // Request a string response from the provided URL.
-//        StringRequest stringRequest = new StringRequest(Request.Method.GET, newUrl,
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        jsonResponse = response;
-//                        Log.d("RESPONSE", "onResponse: " + response);
-//                    }
-//                }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                Log.d("SHIT", "onErrorResponse: wrong");
-//            }
-//        });
-//        queue.add(stringRequest);
-
-        Dish spaghetti = new Dish("Spaghetti and Meatballs", "entrees", "Seasoned meatballs on top of freshly-made spaghetti. Served with a robust tomato sauce.", "http://resto.mprog.nl/images/spaghetti.jpg", 1, 9.0);
-        Dish soup = new Dish("Chicken Noodle Soup", "appetizers", "Delicious chicken simmered alongside yellow onions, carrots, celery, and bay leaves, chicken stock.", "http://resto.mprog.nl/images/chickensoup.jpg", 5, 3.0);
-
-        menu.add(spaghetti);
-        menu.add(soup);
-    }
-
-    public void saveToSharedPrefs(){
-        SharedPreferences prefs = getSharedPreferences("settings", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        Gson gson = new Gson();
-
-        String json = gson.toJson(order);
-
-        editor.putString("order", json);
-        editor.commit();
-    }
-
-    public void loadFromSharedPrefs(){
-        SharedPreferences prefs = getSharedPreferences("settings", Context.MODE_PRIVATE);
-
-        Gson gson = new Gson();
-        String json = prefs.getString("order", null);
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
-        ArrayList<String> order = gson.fromJson(json, type);
-
-        if(order == null) {
-            Log.d("NULL", "loadFromSharedPrefs: null");
-            order = new ArrayList<>();
-        }
+    public void onSeeOrderButtonClick(View view) {
+        Intent intent = new Intent(MenuActivity.this, OrderActivity.class);
+        startActivity(intent);
+        finish();
     }
 }

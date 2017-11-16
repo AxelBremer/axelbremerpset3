@@ -5,20 +5,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="axelbremer.axelbremerpset3.MenuActivity">
+    tools:context="axelbremer.axelbremerpset3.LastActivity">
 
-    <ListView
-        android:id="@+id/menuListView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="9" />
-
-    <Button
-        android:id="@+id/seeOrderButton"
+    <TextView
+        android:id="@+id/doneTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
+        android:layout_weight="1" />
+
+    <Button
+        android:id="@+id/againButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:onClick="onSeeOrderButtonClick"
-        android:text="@string/check_order" />
+        android:text="@string/new_order"
+        android:onClick="newOrderClick"/>
 </LinearLayout>

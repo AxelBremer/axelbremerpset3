@@ -1,10 +1,6 @@
 package axelbremer.axelbremerpset3;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,17 +8,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class DishActivity extends AppCompatActivity {
 
@@ -31,15 +18,18 @@ public class DishActivity extends AppCompatActivity {
     Dish currentDish;
     TextView nameView, descView, priceView, catView;
     ImageView dishImageView;
+    MyGlobals myGlob;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dish);
 
-        getMenu();
+        myGlob = new MyGlobals(getApplicationContext());
 
-        loadFromSharedPrefs();
+        order = myGlob.loadFromSharedPrefs();
+
+        menu = myGlob.getMenu();
 
         Intent intent = getIntent();
 
@@ -88,32 +78,6 @@ public class DishActivity extends AppCompatActivity {
         return dish;
     }
 
-    private void getMenu() {
-//        String newUrl = url + "menu";
-//
-//        // Request a string response from the provided URL.
-//        StringRequest stringRequest = new StringRequest(Request.Method.GET, newUrl,
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        jsonResponse = response;
-//                        Log.d("RESPONSE", "onResponse: " + response);
-//                    }
-//                }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                Log.d("SHIT", "onErrorResponse: wrong");
-//            }
-//        });
-//        queue.add(stringRequest);
-
-        Dish spaghetti = new Dish("Spaghetti and Meatballs", "entrees", "Seasoned meatballs on top of freshly-made spaghetti. Served with a robust tomato sauce.", "http://resto.mprog.nl/images/spaghetti.jpg", 1, 9.0);
-        Dish soup = new Dish("Chicken Noodle Soup", "appetizers", "Delicious chicken simmered alongside yellow onions, carrots, celery, and bay leaves, chicken stock.", "http://resto.mprog.nl/images/chickensoup.jpg", 5, 3.0);
-
-        menu.add(spaghetti);
-        menu.add(soup);
-    }
-
     public void onAddButtonClick(View view) {
         order.add(currentDish.getName());
 
@@ -121,36 +85,16 @@ public class DishActivity extends AppCompatActivity {
             Log.d("DISHACTIVITY", order.get(i));
         }
 
-        saveToSharedPrefs();
+        myGlob.saveToSharedPrefs(order);
 
         Intent intent = new Intent(DishActivity.this, OrderActivity.class);
         startActivity(intent);
         finish();
     }
 
-    public void saveToSharedPrefs(){
-        SharedPreferences prefs = getSharedPreferences("settings", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        Gson gson = new Gson();
-
-        String json = gson.toJson(order);
-
-        editor.putString("order", json);
-        editor.commit();
+    public void onSeeOrderButtonClick(View view) {
+        Intent intent = new Intent(DishActivity.this, OrderActivity.class);
+        startActivity(intent);
+        finish();
     }
-
-    public void loadFromSharedPrefs(){
-        SharedPreferences prefs = getSharedPreferences("settings", Context.MODE_PRIVATE);
-
-        Gson gson = new Gson();
-        String json = prefs.getString("order", null);
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
-        ArrayList<String> order = gson.fromJson(json, type);
-
-        if(order == null) {
-            Log.d("NULL", "loadFromSharedPrefs: null");
-            order = new ArrayList<>();
-        }
-    }
-
 }
