@@ -34,7 +34,6 @@ public class MenuActivity extends AppCompatActivity {
     List<Dish> menu = new ArrayList<>();
     List categoryList = new ArrayList();
     ArrayAdapter adapter;
-    String url;
     RequestQueue queue;
     MyGlobals myGlob;
 
@@ -44,34 +43,50 @@ public class MenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_menu);
 
         menuListView = findViewById(R.id.menuListView);
-        url = "https://resto.mprog.nl/";
-        queue = Volley.newRequestQueue(this);
 
         myGlob = new MyGlobals(getApplicationContext());
 
-        myGlob.getMenu();
+        queue = Volley.newRequestQueue(this);
 
-        myGlob.loadFromSharedPrefs();
+        String newUrl = "https://resto.mprog.nl/menu";
 
-        for(int i = 0; i < menu.size(); i++) {
-            Dish temp = menu.get(i);
-            categoryList.add(temp.getCategory());
-        }
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, newUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        menu = myGlob.createMenu(response);
+                        Log.d("RESPONSE", "onResponse: " + response);
 
-        list = categoryList;
+                        for(int i = 0; i < menu.size(); i++) {
+                            Dish temp = menu.get(i);
+                            if (!categoryList.contains(temp.getCategory())) {
+                                categoryList.add(temp.getCategory());
+                            }
+                        }
 
-        updateListView();
+                        list = categoryList;
 
-        menuListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        updateListView();
+
+                        menuListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position,
+                                                    long id) {
+                                Intent intent = new Intent(MenuActivity.this, CategoryActivity.class);
+                                String category = (String) categoryList.get(position);
+                                intent.putExtra("Category", category);
+                                startActivity(intent);
+                            }
+                        });
+                    }
+                }, new Response.ErrorListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position,
-                                    long id) {
-                Intent intent = new Intent(MenuActivity.this, CategoryActivity.class);
-                String category = (String) categoryList.get(position);
-                intent.putExtra("Category", category);
-                startActivity(intent);
+            public void onErrorResponse(VolleyError error) {
+                Log.d("SHIT", "onErrorResponse: wrong");
             }
         });
+        queue.add(stringRequest);
     }
 
     private void updateListView() {

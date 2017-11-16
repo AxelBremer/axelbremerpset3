@@ -69,7 +69,9 @@ public class MyGlobals {
         editor.commit();
     }
 
-    private void createMenu(String response) {
+    public List<Dish> createMenu(String response) {
+        List<Dish> menu = new ArrayList<>();
+
         Log.d("menu", "createMenu: ");
         try {
             JSONObject obj = new JSONObject(response);
@@ -78,9 +80,13 @@ public class MyGlobals {
             for(int i = 0; i < arr.length(); i++) {
                 JSONObject dish = arr.getJSONObject(i);
                 String name = dish.getString("name");
+                Log.d("DISH", name);
                 String cat = dish.getString("category");
+                Log.d("DISH", cat);
                 String desc = dish.getString("description");
-                String url = dish.getString("url");
+                Log.d("DISH", desc);
+                String url = dish.getString("image_url");
+                Log.d("DISH", url);
                 Double price = dish.getDouble("price");
                 Integer id = dish.getInt("id");
                 Dish newDish = new Dish(name, cat, desc, url, id, price);
@@ -89,6 +95,8 @@ public class MyGlobals {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        return menu;
     }
 
     public ArrayList<String> loadFromSharedPrefs(){

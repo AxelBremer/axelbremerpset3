@@ -9,6 +9,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +24,7 @@ public class CategoryActivity extends AppCompatActivity {
     List list = new ArrayList();
     List<String> order = new ArrayList<>();
     String category;
+    RequestQueue queue;
     List<Dish> menu = new ArrayList<>();
     List<Dish> catMenu = new ArrayList<>();
     ArrayAdapter adapter;
@@ -36,36 +44,54 @@ public class CategoryActivity extends AppCompatActivity {
         Intent intent = getIntent();
         category = intent.getStringExtra("Category");
 
-        menu = myGlob.getMenu();
+        queue = Volley.newRequestQueue(this);
 
-        for(int i = 0; i < menu.size(); i++) {
-            Dish temp = menu.get(i);
-            Log.d("MENU", "dish: " + temp.getName());
-            if(temp.getCategory().equals(category)) {
-                catMenu.add(temp);
-            }
-        }
+        String newUrl = "https://resto.mprog.nl/menu";
 
-        for(int i = 0; i < catMenu.size(); i++) {
-            Dish temp = catMenu.get(i);
-            Log.d("CATMENU", "dishInCat: " + temp.getName());
-            list.add(temp.getName());
-        }
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, newUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        menu = myGlob.createMenu(response);
+                        Log.d("RESPONSE", "onResponse: " + response);
 
-        categoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        for(int i = 0; i < menu.size(); i++) {
+                            Dish temp = menu.get(i);
+                            Log.d("MENU", "dish: " + temp.getName());
+                            if(temp.getCategory().equals(category)) {
+                                catMenu.add(temp);
+                            }
+                        }
+
+                        for(int i = 0; i < catMenu.size(); i++) {
+                            Dish temp = catMenu.get(i);
+                            Log.d("CATMENU", "dishInCat: " + temp.getName());
+                            list.add(temp.getName());
+                        }
+
+                        categoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position,
+                                                    long id) {
+                                Intent intent = new Intent(CategoryActivity.this, DishActivity.class);
+                                Dish chosen = getDishByName((String)list.get(position));
+                                Integer chosenId = chosen.getId();
+                                intent.putExtra("Id", chosenId);
+                                startActivity(intent);
+                                finish();
+                            }
+                        });
+
+                        updateListView();
+                    }
+                }, new Response.ErrorListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position,
-                                    long id) {
-                Intent intent = new Intent(CategoryActivity.this, DishActivity.class);
-                Dish chosen = getDishByName((String)list.get(position));
-                Integer chosenId = chosen.getId();
-                intent.putExtra("Id", chosenId);
-                startActivity(intent);
-                finish();
+            public void onErrorResponse(VolleyError error) {
+                Log.d("SHIT", "onErrorResponse: wrong");
             }
         });
-
-        updateListView();
+        queue.add(stringRequest);
 
     }
 
