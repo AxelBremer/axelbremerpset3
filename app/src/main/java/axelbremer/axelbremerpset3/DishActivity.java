@@ -1,23 +1,33 @@
 package axelbremer.axelbremerpset3;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DishActivity extends AppCompatActivity {
 
     List<Dish> menu = new ArrayList<>();
+    List<String> order = new ArrayList<>();
     Dish currentDish;
     TextView nameView, descView, priceView, catView;
     ImageView dishImageView;
@@ -28,6 +38,8 @@ public class DishActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dish);
 
         getMenu();
+
+        loadFromSharedPrefs();
 
         Intent intent = getIntent();
 
@@ -103,5 +115,42 @@ public class DishActivity extends AppCompatActivity {
     }
 
     public void onAddButtonClick(View view) {
+        order.add(currentDish.getName());
+
+        for(int i = 0; i < order.size(); i++) {
+            Log.d("DISHACTIVITY", order.get(i));
+        }
+
+        saveToSharedPrefs();
+
+        Intent intent = new Intent(DishActivity.this, OrderActivity.class);
+        startActivity(intent);
+        finish();
     }
+
+    public void saveToSharedPrefs(){
+        SharedPreferences prefs = getSharedPreferences("settings", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        Gson gson = new Gson();
+
+        String json = gson.toJson(order);
+
+        editor.putString("order", json);
+        editor.commit();
+    }
+
+    public void loadFromSharedPrefs(){
+        SharedPreferences prefs = getSharedPreferences("settings", Context.MODE_PRIVATE);
+
+        Gson gson = new Gson();
+        String json = prefs.getString("order", null);
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        ArrayList<String> order = gson.fromJson(json, type);
+
+        if(order == null) {
+            Log.d("NULL", "loadFromSharedPrefs: null");
+            order = new ArrayList<>();
+        }
+    }
+
 }

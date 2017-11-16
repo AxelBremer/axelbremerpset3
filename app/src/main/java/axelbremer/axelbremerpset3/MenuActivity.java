@@ -1,6 +1,8 @@
 package axelbremer.axelbremerpset3;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,10 +17,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +32,7 @@ public class MenuActivity extends AppCompatActivity {
     ListView menuListView;
     List list = new ArrayList();
     List<Dish> menu = new ArrayList<>();
+    List<String> order = new ArrayList<>();
     List categoryList = new ArrayList();
     ArrayAdapter adapter;
     String url;
@@ -43,6 +49,8 @@ public class MenuActivity extends AppCompatActivity {
         queue = Volley.newRequestQueue(this);
 
         getMenu();
+
+        loadFromSharedPrefs();
 
         for(int i = 0; i < menu.size(); i++) {
             Dish temp = menu.get(i);
@@ -95,5 +103,30 @@ public class MenuActivity extends AppCompatActivity {
 
         menu.add(spaghetti);
         menu.add(soup);
+    }
+
+    public void saveToSharedPrefs(){
+        SharedPreferences prefs = getSharedPreferences("settings", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        Gson gson = new Gson();
+
+        String json = gson.toJson(order);
+
+        editor.putString("order", json);
+        editor.commit();
+    }
+
+    public void loadFromSharedPrefs(){
+        SharedPreferences prefs = getSharedPreferences("settings", Context.MODE_PRIVATE);
+
+        Gson gson = new Gson();
+        String json = prefs.getString("order", null);
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        ArrayList<String> order = gson.fromJson(json, type);
+
+        if(order == null) {
+            Log.d("NULL", "loadFromSharedPrefs: null");
+            order = new ArrayList<>();
+        }
     }
 }
