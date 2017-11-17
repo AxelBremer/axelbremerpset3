@@ -116,21 +116,6 @@ public class MyGlobals {
         return order;
     }
 
-    public List<Dish> getMenu() {
-
-//        Dish spaghetti = new Dish("Spaghetti and Meatballs", "entrees", "Seasoned meatballs on top of freshly-made spaghetti. Served with a robust tomato sauce.", "http://resto.mprog.nl/images/spaghetti.jpg", 1, 9.0);
-//        Dish soup = new Dish("Chicken Noodle Soup", "appetizers", "Delicious chicken simmered alongside yellow onions, carrots, celery, and bay leaves, chicken stock.", "http://resto.mprog.nl/images/chickensoup.jpg", 5, 3.0);
-//
-//        menu.add(spaghetti);
-//        menu.add(soup);
-
-        while(wait) {
-            Log.d("WAIT", "getMenu: ");
-        }
-
-        return menu;
-    }
-
     public void clearPrefs() {
         SharedPreferences prefs = mContext.getSharedPreferences("settings", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();

@@ -1,6 +1,8 @@
 package axelbremer.axelbremerpset3;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,8 +18,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class DishActivity extends AppCompatActivity {
 
@@ -28,6 +35,7 @@ public class DishActivity extends AppCompatActivity {
     ImageView dishImageView;
     RequestQueue queue;
     MyGlobals myGlob;
+    Bitmap bmp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,21 +73,30 @@ public class DishActivity extends AppCompatActivity {
                         catView = findViewById(R.id.dishCatTextView);
                         catView.setText(currentDish.getCategory());
 
-
-//                        URL url = null;
-//                        try {
-//                            url = new URL(currentDish.getUrl());
-//                        } catch (MalformedURLException e) {
-//                            e.printStackTrace();
-//                        }
-//                        Bitmap bmp = null;
-//                        try {
-//                            bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//                        dishImageView = findViewById(R.id.dishImageView);
-//                        dishImageView.setImageBitmap(bmp);
+                        new Thread() {
+                            @Override
+                            public void run() {
+                                URL url = null;
+                                try {
+                                    url = new URL(currentDish.getUrl());
+                                } catch (MalformedURLException e) {
+                                    e.printStackTrace();
+                                }
+                                Bitmap bmp = null;
+                                try {
+                                    bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                                    setImage(bmp);
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            refreshImage();
+                                        }
+                                    });
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }.start();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -88,6 +105,15 @@ public class DishActivity extends AppCompatActivity {
             }
         });
         queue.add(stringRequest);
+    }
+
+    private void refreshImage() {
+        dishImageView = findViewById(R.id.dishImageView);
+        dishImageView.setImageBitmap(bmp);
+    }
+
+    private void setImage(Bitmap b) {
+        bmp = b;
     }
 
     private Dish getDishById(Integer chosenId) {
